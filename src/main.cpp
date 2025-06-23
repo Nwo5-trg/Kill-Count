@@ -7,17 +7,23 @@ class $modify(MainMenuGameLayer, MenuGameLayer) {
     struct Fields {
         CCLabelBMFont* killCountLabel;
         std::string labelPrefix = "Kill Count: ";
+        bool enabled;
     };
 
     bool init() {
         if (!MenuGameLayer::init()) return false;
 
         auto mod = Mod::get();
+
+        m_fields->enabled = mod->getSettingValue<bool>("enabled");
+        if (!m_fields->enabled) return true;
+        
         auto winSize = CCDirector::get()->getWinSize();
 
         float labelScale = mod->getSettingValue<double>("label-scale");
         float labelBuffer = mod->getSettingValue<double>("label-buffer");
         m_fields->labelPrefix = mod->getSettingValue<std::string>("label-prefix");
+        auto labelColor = mod->getSettingValue<ccColor4B>("label-color");
 
         auto labelPositionString = mod->getSettingValue<std::string>("label-position");
         int labelPosition = 4;
@@ -40,6 +46,8 @@ class $modify(MainMenuGameLayer, MenuGameLayer) {
         }
         
         auto killCountLabel = CCLabelBMFont::create("", "chatFont.fnt");
+        killCountLabel->setColor(ccc3(labelColor.r, labelColor.g, labelColor.b));
+        killCountLabel->setOpacity(labelColor.a);
         killCountLabel->setScale(labelScale);
         this->addChild(killCountLabel);
         m_fields->killCountLabel = killCountLabel;
@@ -83,7 +91,7 @@ class $modify(MainMenuGameLayer, MenuGameLayer) {
 
     void destroyPlayer() {
         MenuGameLayer::destroyPlayer();
-        updateKillCountLabel();
+        if (m_fields->enabled) updateKillCountLabel();
     }
 
     void updateKillCountLabel() {
