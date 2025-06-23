@@ -1,0 +1,60 @@
+{
+	"geode": "4.5.0",
+	"gd": {
+		"win": "2.2074",
+		"android": "2.2074",
+		"mac": "2.2074",
+		"ios": "2.2074"
+	},
+	"id": "nwo5.kill_count",
+	"name": "Kill Count",
+	"version": "v1.0.0",
+	"developer": "Nwo5",
+	"description": "*murders cutely* :3",
+	"links": {"source": "https://github.com/Nwo5-trg/Kill-Count"},
+	"tags": ["offline"],
+	"settings": {
+		"label-position": {
+			"type": "string",
+			"name": "Label Position",
+			"default": "Top Right",
+			"one-of": ["Top Right", "Top Left", "Bottom Left", "Bottom Right"]
+		},
+		"label-prefix": {
+			"type": "string",
+			"name": "Label Prefix",
+			"default": "Kill Count: "
+		},
+		"label-scale": {
+			"type": "float",
+			"name": "Label Scale",
+			"default": 0.75
+		},
+		"label-buffer": {
+			"type": "float",
+			"name": "Label Buffer",
+			"default": 5
+		},
+		"label-font": {
+			"type": "int",
+    		"name": "Label Font",
+			"description": "0, is default, 1-59 are editor fonts, 60 is chat font, 61 is gold font",
+			"default": 60,
+			"min": 0,
+            "max": 61
+		},
+		"chroma": {
+			"type": "bool",
+			"name": "Chroma",
+			"description": "gay?",
+			"default": false
+		},
+		"chroma-speed": {
+			"type": "float",
+			"name": "Chroma Speed",
+			"description": "how gay.",
+			"default": 0.25,
+			"min": 0.05
+		}
+	}
+}
