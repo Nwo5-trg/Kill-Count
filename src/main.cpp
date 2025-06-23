@@ -17,7 +17,7 @@ class $modify(MainMenuGameLayer, MenuGameLayer) {
 
         m_fields->enabled = mod->getSettingValue<bool>("enabled");
         if (!m_fields->enabled) return true;
-        
+
         auto winSize = CCDirector::get()->getWinSize();
 
         float labelScale = mod->getSettingValue<double>("label-scale");
@@ -83,6 +83,7 @@ class $modify(MainMenuGameLayer, MenuGameLayer) {
                 CCTintTo::create(speed, 128, 255, 128), CCTintTo::create(speed, 128, 255, 255),
                 CCTintTo::create(speed, 128, 128, 255), CCTintTo::create(speed, 255, 128, 255),
             nullptr));
+            killCountLabel->setColor(ccWHITE);
             killCountLabel->runAction(rgbtqiaplus16mcolultra4khd);
         }
 
