@@ -1,103 +1,72 @@
-#include <Geode/Geode.hpp>
 #include <Geode/modify/MenuGameLayer.hpp>
+#include <nwo5.silly-api/include/include.hpp>
+#include "settings.hpp"
 
 using namespace geode::prelude;
+using namespace nwo5::prelude;
 
-class $modify(MainMenuGameLayer, MenuGameLayer) {
+class $modify(MenuGameLayerHook, MenuGameLayer) {
     struct Fields {
-        CCLabelBMFont* killCountLabel;
-        std::string labelPrefix = "Kill Count: ";
-        bool enabled;
+        CCLabelBMFont* killCountLabel = nullptr;
     };
 
     bool init() {
-        if (!MenuGameLayer::init()) return false;
-
-        auto mod = Mod::get();
-
-        m_fields->enabled = mod->getSettingValue<bool>("enabled");
-        if (!m_fields->enabled) return true;
-
-        auto winSize = CCDirector::get()->getWinSize();
-
-        float labelScale = mod->getSettingValue<double>("label-scale");
-        float labelBuffer = mod->getSettingValue<double>("label-buffer");
-        m_fields->labelPrefix = mod->getSettingValue<std::string>("label-prefix");
-        auto labelColor = mod->getSettingValue<ccColor4B>("label-color");
-
-        auto labelPositionString = mod->getSettingValue<std::string>("label-position");
-        int labelPosition = 4;
-        if (labelPositionString == "Top Right") labelPosition = 1;
-        else if (labelPositionString == "Top Left") labelPosition = 2;
-        else if (labelPositionString == "Bottom Left") labelPosition = 3;
-
-        int labelFont = mod->getSettingValue<int64_t>("label-font");
-        std::string fontString = "";
-        float fontScale = 0.75f;
-        if (labelFont == 0) fontString = "bigFont.fnt";
-        else if (labelFont <= 59) {
-            fontString = std::string("gjFont") + (labelFont < 10 ? "0" : "") + std::to_string(labelFont) + ".fnt";
-        } else if (labelFont == 60) {
-            fontString = "chatFont.fnt";
-            fontScale = 1.75f;
-        } else if (labelFont == 61) {
-            fontString = "goldFont.fnt";
-            fontScale = 1.0f;
+        if (!MenuGameLayer::init()) {
+            return false;
         }
+
+        if (!Settings::enabled) {
+            return true;
+        }
+
+        auto fields = m_fields.self();
         
-        auto killCountLabel = CCLabelBMFont::create("", "chatFont.fnt");
-        killCountLabel->setColor(ccc3(labelColor.r, labelColor.g, labelColor.b));
-        killCountLabel->setOpacity(labelColor.a);
-        killCountLabel->setScale(labelScale);
-        this->addChild(killCountLabel);
-        m_fields->killCountLabel = killCountLabel;
-        updateKillCountLabel();
+        m_fields->killCountLabel = ui::node(Setup(
+            ui::label("", nwo5::utils::getFontString(Settings::labelFont)
+        ))
+            .id("kill-count-label"_spr)
+            .color(color_cast<ccColor3B>(Settings::labelColor.get()))
+            .opacity(Settings::labelColor.get().a) 
+            .scale(Settings::labelScale)
+            .parent(this)
+        );
 
-        switch (labelPosition) {
-            case 1: {
-                killCountLabel->setPosition(winSize - labelBuffer);
-                killCountLabel->setAnchorPoint(ccp(1.0f, 1.0f));
-                break;
-            }
-            case 2: {
-                killCountLabel->setPosition(labelBuffer, winSize.height - labelBuffer);
-                killCountLabel->setAnchorPoint(ccp(0.0f, 1.0f));
-                break;
-            }
-            case 3: {
-                killCountLabel->setPosition(labelBuffer, labelBuffer);
-                killCountLabel->setAnchorPoint(ccp(0.0f, 0.0f));
-                break;
-            }
-            case 4: {
-                killCountLabel->setPosition(winSize.width - labelBuffer, labelBuffer);
-                killCountLabel->setAnchorPoint(ccp(1.0f, 0.0f));
-                break;
-            }
+        const auto winSize = CCDirector::get()->getWinSize();
+        if (Settings::labelPosition.get() == "Top Right") {
+            fields->killCountLabel->setPosition(winSize - Settings::labelBuffer);
+            fields->killCountLabel->setAnchorPoint(ccp(1.0f, 1.0f));
+        }
+        else if (Settings::labelPosition.get() == "Top Left") {
+            fields->killCountLabel->setPosition(Settings::labelBuffer, winSize.height - Settings::labelBuffer);
+            fields->killCountLabel->setAnchorPoint(ccp(0.0f, 1.0f));
+        }
+        else if (Settings::labelPosition.get() == "Bottom Left") {
+            fields->killCountLabel->setPosition(Settings::labelBuffer, Settings::labelBuffer);
+            fields->killCountLabel->setAnchorPoint(ccp(0.0f, 0.0f));
+        }
+        else if (Settings::labelPosition.get() == "Bottom Right") {
+            fields->killCountLabel->setPosition(winSize.width - Settings::labelBuffer, Settings::labelBuffer);
+            fields->killCountLabel->setAnchorPoint(ccp(1.0f, 0.0f));
         }
 
-        if (mod->getSettingValue<bool>("chroma")) {
-            auto speed = mod->getSettingValue<float>("chroma-speed");
-            auto rgbtqiaplus16mcolultra4khd = CCRepeatForever::create(CCSequence::create(
-                CCTintTo::create(speed, 255, 128, 128), CCTintTo::create(speed, 255, 255, 128),
-                CCTintTo::create(speed, 128, 255, 128), CCTintTo::create(speed, 128, 255, 255),
-                CCTintTo::create(speed, 128, 128, 255), CCTintTo::create(speed, 255, 128, 255),
-            nullptr));
-            killCountLabel->setColor(ccWHITE);
-            killCountLabel->runAction(rgbtqiaplus16mcolultra4khd);
-        }
+        schedule(schedule_selector(MenuGameLayerHook::updateKillCountLabel));
 
         return true;
     }
 
-    void destroyPlayer() {
-        MenuGameLayer::destroyPlayer();
-        if (m_fields->enabled) updateKillCountLabel();
-    }
-
-    void updateKillCountLabel() {
+    void updateKillCountLabel(float) {
         if (auto label = m_fields->killCountLabel) {
-            label->setString((m_fields->labelPrefix + std::to_string(GameStatsManager::get()->getStat("9"))).c_str());
+            label->setString(fmt::format("{}{}", Settings::labelPrefix.get(), GameStatsManager::get()->getStat("9")).c_str());
+
+            if (Settings::chroma) {
+                label->setColor(
+                    nwo5::utils::getChroma<ccColor3B>(Settings::chromaSpeed, {}, 0.5f)
+                );
+            }
         }
     }
 };
+
+$on_mod(Loaded) {
+    SettingsManager::get()->load();
+}
