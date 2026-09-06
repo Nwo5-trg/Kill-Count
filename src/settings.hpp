@@ -4,7 +4,7 @@
 
 using namespace nwo5::settings::prelude;
 
-namespace Settings {
+namespace settings {
     inline Setting<bool> enabled{"enabled"};
     inline Setting<std::string> labelPosition{"label-position"};
     inline Setting<std::string> labelPrefix{"label-prefix"};

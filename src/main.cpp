@@ -5,9 +5,9 @@
 using namespace geode::prelude;
 using namespace nwo5::prelude;
 
-class $modify(MenuGameLayerHook, MenuGameLayer) {
+class $modify(KillCountMenuGameLayer, MenuGameLayer) {
     struct Fields {
-        CCLabelBMFont* killCountLabel = nullptr;
+        geode::Label* killCountLabel = nullptr;
     };
 
     bool init() {
@@ -15,52 +15,49 @@ class $modify(MenuGameLayerHook, MenuGameLayer) {
             return false;
         }
 
-        if (!Settings::enabled) {
+        if (!settings::enabled) {
             return true;
         }
 
         auto fields = m_fields.self();
         
-        m_fields->killCountLabel = ui::node(Setup(
-            ui::label("", nwo5::utils::getFontString(Settings::labelFont)
-        ))
+        m_fields->killCountLabel = ui::label("", nwo5::utils::getFontString(settings::labelFont))
             .id("kill-count-label"_spr)
-            .color(color_cast<ccColor3B>(Settings::labelColor.get()))
-            .opacity(Settings::labelColor.get().a) 
-            .scale(Settings::labelScale)
-            .parent(this)
-        );
+            .color(color_cast<ccColor3B>(settings::labelColor.get()))
+            .opacity(settings::labelColor.get().a) 
+            .scale(settings::labelScale)
+            .parent(this);
 
         const auto winSize = CCDirector::get()->getWinSize();
-        if (Settings::labelPosition.get() == "Top Right") {
-            fields->killCountLabel->setPosition(winSize - Settings::labelBuffer);
+        if (settings::labelPosition.get() == "Top Right") {
+            fields->killCountLabel->setPosition(winSize - settings::labelBuffer);
             fields->killCountLabel->setAnchorPoint(ccp(1.0f, 1.0f));
         }
-        else if (Settings::labelPosition.get() == "Top Left") {
-            fields->killCountLabel->setPosition(Settings::labelBuffer, winSize.height - Settings::labelBuffer);
+        else if (settings::labelPosition.get() == "Top Left") {
+            fields->killCountLabel->setPosition(settings::labelBuffer, winSize.height - settings::labelBuffer);
             fields->killCountLabel->setAnchorPoint(ccp(0.0f, 1.0f));
         }
-        else if (Settings::labelPosition.get() == "Bottom Left") {
-            fields->killCountLabel->setPosition(Settings::labelBuffer, Settings::labelBuffer);
+        else if (settings::labelPosition.get() == "Bottom Left") {
+            fields->killCountLabel->setPosition(settings::labelBuffer, settings::labelBuffer);
             fields->killCountLabel->setAnchorPoint(ccp(0.0f, 0.0f));
         }
-        else if (Settings::labelPosition.get() == "Bottom Right") {
-            fields->killCountLabel->setPosition(winSize.width - Settings::labelBuffer, Settings::labelBuffer);
+        else if (settings::labelPosition.get() == "Bottom Right") {
+            fields->killCountLabel->setPosition(winSize.width - settings::labelBuffer, settings::labelBuffer);
             fields->killCountLabel->setAnchorPoint(ccp(1.0f, 0.0f));
         }
 
-        schedule(schedule_selector(MenuGameLayerHook::updateKillCountLabel));
+        schedule(schedule_selector(KillCountMenuGameLayer::updateKillCountLabel));
 
         return true;
     }
 
     void updateKillCountLabel(float) {
         if (auto label = m_fields->killCountLabel) {
-            label->setString(fmt::format("{}{}", Settings::labelPrefix.get(), GameStatsManager::get()->getStat("9")).c_str());
+            label->setText(fmt::format("{}{}", settings::labelPrefix.get(), GameStatsManager::get()->getStat("9")));
 
-            if (Settings::chroma) {
+            if (settings::chroma) {
                 label->setColor(
-                    nwo5::utils::getChroma<ccColor3B>(Settings::chromaSpeed, {}, 0.5f)
+                    nwo5::utils::getChroma<ccColor3B>(settings::chromaSpeed, {}, 0.5f)
                 );
             }
         }
