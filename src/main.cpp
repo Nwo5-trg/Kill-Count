@@ -1,9 +1,9 @@
 #include <Geode/modify/MenuGameLayer.hpp>
-#include <nwo5.silly-api/include/include.hpp>
+#include <nwo5.silly-api/include.hpp>
 #include "settings.hpp"
 
-using namespace geode::prelude;
 using namespace nwo5::prelude;
+using namespace geode::prelude;
 
 class $modify(KillCountMenuGameLayer, MenuGameLayer) {
     struct Fields {
@@ -21,7 +21,7 @@ class $modify(KillCountMenuGameLayer, MenuGameLayer) {
 
         auto fields = m_fields.self();
         
-        m_fields->killCountLabel = ui::label("", nwo5::utils::getFontString(settings::labelFont))
+        m_fields->killCountLabel = ui::label(nwo5::utils::getFontString(settings::labelFont))
             .id("kill-count-label"_spr)
             .color(color_cast<ccColor3B>(settings::labelColor.get()))
             .opacity(settings::labelColor.get().a) 
@@ -63,7 +63,3 @@ class $modify(KillCountMenuGameLayer, MenuGameLayer) {
         }
     }
 };
-
-$on_mod(Loaded) {
-    SettingsManager::get()->load();
-}

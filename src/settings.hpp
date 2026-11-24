@@ -1,17 +1,17 @@
 #pragma once
 
-#include <nwo5.silly-api/include/settings/include.hpp>
+#include <nwo5.silly-api/cache/include.hpp>
 
-using namespace nwo5::settings::prelude;
+using namespace nwo5::cache::prelude;
 
 namespace settings {
-    inline Setting<bool> enabled{"enabled"};
-    inline Setting<std::string> labelPosition{"label-position"};
-    inline Setting<std::string> labelPrefix{"label-prefix"};
-    inline Setting<cocos2d::ccColor4B> labelColor{"label-color"};
-    inline Setting<float> labelScale{"label-scale"};
-    inline Setting<float> labelBuffer{"label-buffer"};
-    inline Setting<int> labelFont{"label-font"};
-    inline Setting<bool> chroma{"chroma"};
-    inline Setting<float> chromaSpeed{"chroma-speed"};
+    inline SettingCache<bool> enabled{"enabled"};
+    inline SettingCache<std::string> labelPosition{"label-position"};
+    inline SettingCache<std::string> labelPrefix{"label-prefix"};
+    inline SettingCache<cocos2d::ccColor4B> labelColor{"label-color"};
+    inline SettingCache<float> labelScale{"label-scale"};
+    inline SettingCache<float> labelBuffer{"label-buffer"};
+    inline SettingCache<int> labelFont{"label-font"};
+    inline SettingCache<bool> chroma{"chroma"};
+    inline SettingCache<float> chromaSpeed{"chroma-speed"};
 }

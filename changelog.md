@@ -1,3 +1,6 @@
+## v2.1.0
+- 2.2091
+
 ## v2.0.1
 - oopsies i forgot this existed
 
